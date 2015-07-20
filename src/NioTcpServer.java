@@ -30,13 +30,13 @@ public class NioTcpServer extends Thread {
     @Override
     public void run(){
         try {
-            Selector selector = Selector.open();//´ò¿ªÑ¡ÔñÆ÷
-            ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();//´ò¿ªÍ¨µÀ
-            serverSocketChannel.configureBlocking(false);//·Ç×èÈû
+            Selector selector = Selector.open();//ï¿½ï¿½Ñ¡ï¿½ï¿½ï¿½ï¿½
+            ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();//ï¿½ï¿½Í¨ï¿½ï¿½
+            serverSocketChannel.configureBlocking(false);//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             serverSocketChannel.socket().bind(inetSocketAddress);
-            serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);// ÏòÍ¨µÀ×¢²áÑ¡ÔñÆ÷ºÍ¶ÔÓ¦ÊÂ¼þ±êÊ¶
+            serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);// ï¿½ï¿½Í¨ï¿½ï¿½×¢ï¿½ï¿½Ñ¡ï¿½ï¿½ï¿½ï¿½ï¿½Í¶ï¿½Ó¦ï¿½Â¼ï¿½ï¿½ï¿½Ê¶
             log.info("Server: socket server started.");
-            while(true){//ÂÖÑ¯
+            while(true){//ï¿½ï¿½Ñ¯
                 int nKeys = selector.select(3000);
                 if(nKeys>0){
                     Set<SelectionKey> selectedKeys = selector.selectedKeys();
@@ -62,25 +62,25 @@ public class NioTcpServer extends Thread {
         }
     }
     /**
-     * ¼òµ¥´¦ÀíÆ÷½Ó¿Ú
+     * ï¿½òµ¥´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¿ï¿½
      *
      * @author shirdrn
      */
     interface Handler {
         /**
-         * ´¦Àí{@link SelectionKey#OP_ACCEPT}ÊÂ¼þ
+         * ï¿½ï¿½ï¿½ï¿½{@link SelectionKey#OP_ACCEPT}ï¿½Â¼ï¿½
          * @param key
          * @throws Exception
          */
         void handleAccept(SelectionKey key) throws Exception;
         /**
-         * ´¦Àí{@link SelectionKey#OP_READ}ÊÂ¼þ
+         * ï¿½ï¿½ï¿½ï¿½{@link SelectionKey#OP_READ}ï¿½Â¼ï¿½
          * @param key
          * @throws Exception
          */
         void handleRead(SelectionKey key) throws Exception;
         /**
-         * ´¦Àí{@link SelectionKey#OP_WRITE}ÊÂ¼þ
+         * ï¿½ï¿½ï¿½ï¿½{@link SelectionKey#OP_WRITE}ï¿½Â¼ï¿½
          * @param key
          * @throws Exception
          */
@@ -119,7 +119,6 @@ public class NioTcpServer extends Thread {
                             break;
                         }
                         UserToUser user2user = (UserToUser)key.attachment();
-                        System.out.println(user2user.toString());
                         if(user2user == null)
                             break;
                         if(!keyMap.containsKey(user2user.getOtherUser()))
@@ -130,6 +129,13 @@ public class NioTcpServer extends Thread {
                         byteBuffer.flip();
                         otherChannel.write(byteBuffer);
                         break;
+                    }
+                    else if(readBytes == -1){
+                        System.out.print("å®¢æˆ·ç«¯æ–­å¼€ï¼š"+socketChannel.getRemoteAddress());
+                        UserToUser user2user = (UserToUser)key.attachment();
+                        String username = user2user.getUser();
+                        keyMap.remove(username);
+                        socketChannel.close();
                     }
                 }
             }catch (Exception e) {
